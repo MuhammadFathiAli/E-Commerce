@@ -16,5 +16,7 @@ namespace Infrastructure
         }
 
         public virtual DbSet<Product> Products { get; set; }
+        public  virtual DbSet<ProductBrand> ProductBrands { get; set; }
+        public virtual DbSet<ProductType> ProductTypes { get; set; }
     }
 }
