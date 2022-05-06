@@ -37,4 +37,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+StoreContextSeed.SeedAsync(app).Wait();
 app.Run();
