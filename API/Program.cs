@@ -1,8 +1,12 @@
+using API.Errors;
 using API.Helper;
+using API.Middleware;
 using Core.Interfaces;
 using Infrastructure;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +25,25 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
     //auto mapper service
 builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
+
+//configure api controller attribute 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+   options.InvalidModelStateResponseFactory = ActionContext =>
+   {
+       var errors = ActionContext.ModelState
+       .Where(e => e.Value.Errors.Count > 0)
+       .SelectMany(x => x.Value.Errors)
+       .Select(x => x.ErrorMessage).ToArray();
+
+       var errorresponse = new ApiValidationErrorResponse
+       {
+           Errors = errors
+       };
+
+       return new BadRequestObjectResult(errorresponse);
+   };
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -28,12 +51,14 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{ 
- 
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// when no endpoint in the app matching the request, this middleware will redirect it to errorcontroller with 0 code as placeholder 
+//which will generate ApiResponse object with 404 status code
+app.UseStatusCodePagesWithReExecute("/error/{0}");
 
 app.UseHttpsRedirection();
 
