@@ -1,4 +1,5 @@
 using API.Errors;
+using API.Extensions;
 using API.Helper;
 using API.Middleware;
 using Core.Interfaces;
@@ -18,35 +19,17 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<StoreContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("StoreDBConnection")));
 
 //Add Custome Services
-    //product repo service
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-    //generic reposiotry service 
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-    //auto mapper service
-builder.Services.AddAutoMapper(typeof(MappingProfiles));
-
-
+//product repo service
+//generic reposiotry service 
+//auto mapper service
 //configure api controller attribute 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-   options.InvalidModelStateResponseFactory = ActionContext =>
-   {
-       var errors = ActionContext.ModelState
-       .Where(e => e.Value.Errors.Count > 0)
-       .SelectMany(x => x.Value.Errors)
-       .Select(x => x.ErrorMessage).ToArray();
 
-       var errorresponse = new ApiValidationErrorResponse
-       {
-           Errors = errors
-       };
+//get the commentary services from the extension 
+builder.Services.AddApplicationServices();
 
-       return new BadRequestObjectResult(errorresponse);
-   };
-});
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// configuring Swagger
+
+
 
 var app = builder.Build();
 
