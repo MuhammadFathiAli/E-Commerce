@@ -38,7 +38,7 @@ namespace Infrastructure.Data
             return await context.ProductBrands.ToListAsync();
         }
 
-        public async Task<IReadOnlyList<ProductType>> GetAllTypessAsync()
+        public async Task<IReadOnlyList<ProductType>> GetAllTypesAsync()
         {
             return await context.ProductTypes.ToListAsync();
         }
