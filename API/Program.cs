@@ -1,13 +1,8 @@
-using API.Errors;
 using API.Extensions;
-using API.Helper;
 using API.Middleware;
-using Core.Interfaces;
 using Infrastructure;
 using Infrastructure.Data;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,16 +23,27 @@ builder.Services.AddDbContext<StoreContext>(options => options.UseSqlServer(buil
 builder.Services.AddApplicationServices();
 
 // configuring Swagger
+builder.Services.AddSwaggerDocumentation();
 
-
+// add cors 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyOrigin();
+        policy.AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseSwagger();
-app.UseSwaggerUI();
+
+//Use Swagger From Extension 
+app.UseSwaggerDocumentation();
 
 // when no endpoint in the app matching the request, this middleware will redirect it to errorcontroller with 0 code as placeholder 
 //which will generate ApiResponse object with 404 status code
@@ -48,6 +54,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseStaticFiles();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 
