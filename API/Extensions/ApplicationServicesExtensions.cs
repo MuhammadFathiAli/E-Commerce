@@ -13,6 +13,7 @@ namespace API.Extensions
             //Add Custome Services
             //product repo service
             Services.AddScoped<IProductRepository, ProductRepository>();
+            Services.AddScoped<IBasketRepository, BasketRepository>();
             //generic reposiotry service 
             Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //auto mapper service

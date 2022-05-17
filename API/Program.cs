@@ -3,6 +3,7 @@ using API.Middleware;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,11 @@ builder.Services.AddControllers();
 //add DbContext 
 builder.Services.AddDbContext<StoreContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("StoreDBConnection")));
 
+// add in memory Redis 
+builder.Services.AddSingleton<IConnectionMultiplexer>(c => {
+    var config = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"), true);
+    return ConnectionMultiplexer.Connect(config);
+});
 //Add Custome Services
 //product repo service
 //generic reposiotry service 
