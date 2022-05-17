@@ -21,15 +21,47 @@ namespace Infrastructure.Identity
             {
                 var identitycontext = serviceScope.ServiceProvider.GetService<AppIdentityDbContext>();
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<AppUser>>();
+                var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
                 identitycontext.Database.EnsureCreated();
-               
-                if (!userManager.Users.Any())
+
+
+                //roles
+                if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                    await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+
+                if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                    await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+
+                //users
+                //1-    admin user
+                var adminUserEmail = "admin@test.com";
+                var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
+                if (adminUser == null)
                 {
-                    var user = new AppUser()
+                    var newadminUser = new AppUser
                     {
-                        DisplayName = "iti",
-                        Email = "iti@test.com",
-                        UserName = "iti@test.com",
+                        DisplayName = "Admin User",
+                        Email = adminUserEmail,
+                        EmailConfirmed = true,
+                        UserName = "Admin"
+                    };
+                    await userManager.CreateAsync(newadminUser, "Coding@1234");
+                    await userManager.AddToRoleAsync(newadminUser, UserRoles.Admin);
+                }
+
+                //2-    app user
+
+                var appUserEmail = "iti@test.com";
+                var appUser = await userManager.FindByEmailAsync(appUserEmail);
+                if (appUser == null)
+                {
+                    var newAppuser = new AppUser
+                    {
+                        DisplayName = "iti App User",
+                        Email = appUserEmail,
+                        UserName = "iti",
+                        EmailConfirmed = true,
                         Address = new Address()
                         {
                             FirstName = "iti",
@@ -38,7 +70,8 @@ namespace Infrastructure.Identity
                             City = "Cairo",
                         }
                     };
-                    await userManager.CreateAsync(user, "Coding@1234");
+                    await userManager.CreateAsync(newAppuser, "Coding@1234");
+                    await userManager.AddToRoleAsync(newAppuser, UserRoles.User);
                 }
             }
         }

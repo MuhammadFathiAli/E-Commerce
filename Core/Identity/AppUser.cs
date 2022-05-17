@@ -11,5 +11,8 @@ namespace Core.Identity
     {
         public string DisplayName { get; set; }
         public Address Address { get; set; }
-    }
+        public string? gender { get; set; }
+        public string? image { get; set; }
+
+    } 
 }

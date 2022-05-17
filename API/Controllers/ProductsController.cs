@@ -5,10 +5,7 @@ using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specification;
-using Infrastructure;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace API.Controllers
 {
@@ -29,9 +26,10 @@ namespace API.Controllers
             this.productTypeRepo = _productTypeRepo;
             this.mapper = _mapper;
         }
+
         [HttpGet]
         public async Task<ActionResult<Pagination<ProductToReturnDto>>> products(
-            [FromQuery]ProductSpecParams productParams)
+            [FromQuery] ProductSpecParams productParams)
         {
             var spec = new ProductsWithTypesAndBrands(productParams);
             var CountSpec = new ProductsWithFiltersCount(productParams);
@@ -39,7 +37,7 @@ namespace API.Controllers
             var products = await productRepo.ListAsync(spec);
             var data = mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
 
-          return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex, productParams.PageSize,TotalItemsCount,data));
+            return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex, productParams.PageSize, TotalItemsCount, data));
         }
 
 
@@ -47,12 +45,12 @@ namespace API.Controllers
         //just a sample to make swagger recognize type of responses in this action 
         //not neccassry to do it in every action 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductToReturnDto>> product(int id)
-        { 
+        {
             var spec = new ProductsWithTypesAndBrands(id);
             var prd = await productRepo.GetEntityWithSpec(spec);
-            return mapper.Map<Product,ProductToReturnDto>(prd);
+            return mapper.Map<Product, ProductToReturnDto>(prd);
         }
 
 
@@ -70,5 +68,18 @@ namespace API.Controllers
             return Ok(await productTypeRepo.GetAllAsync());
 
         }
+
+        [HttpPost("{id}")]
+        public async Task<ActionResult<ProductToReturnDto>> UpdateProduct(int id, [FromBody] Product product)
+        {
+            var prd = await productRepo.UpdateAsync(id, product);
+            return mapper.Map<Product, ProductToReturnDto>(prd);
+        }
+        [HttpDelete]
+        public async Task<ActionResult<bool>> DeleteProduct(int id)
+        {
+           return await productRepo.DeleteAsync(id);
+        }
+
     }
 }

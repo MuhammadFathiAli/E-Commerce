@@ -42,5 +42,24 @@ namespace Infrastructure.Data
         {
             return await context.ProductTypes.ToListAsync();
         }
+
+
+        ////updating => replace the exisitng basket with the basket coming from client 
+        //public async Task<CustomerBasket> UpdateBasketAsync(CustomerBasket basket)
+        //{
+        //    var created = await database.StringSetAsync(basket.Id, JsonSerializer.Serialize(basket), TimeSpan.FromDays(7));
+        //    if (!created) return null;
+        //    return await GetBasketAsync(basket.Id);
+        //}
+
+        public Task<Product> UpdateProductAsync(Product product)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DeleteProductAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

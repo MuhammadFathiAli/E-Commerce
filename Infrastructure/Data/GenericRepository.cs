@@ -2,6 +2,7 @@
 using Core.Interfaces;
 using Core.Specification;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,6 @@ namespace Infrastructure.Data
         {
             this.context = _context;
         }
-
 
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
@@ -44,9 +44,30 @@ namespace Infrastructure.Data
         {
             return await ApplySpecification(spec).CountAsync(); 
         }
+
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
         {
             return SpecificationEvaluator<T>.GetQuery(context.Set<T>().AsQueryable(), spec);
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var entity =  await context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null) return false;
+
+            EntityEntry entityEntry = context.Entry<T>(entity);
+            entityEntry.State = EntityState.Deleted;
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<T> UpdateAsync(int id, T newentity)
+        {
+            var updatedentity = context.Set<T>().FirstOrDefault(x => x.Id == id);
+            EntityEntry entityEntry = context.Entry<T>(updatedentity);
+            entityEntry.State = EntityState.Modified;
+            await context.SaveChangesAsync();
+            return updatedentity;
         }
     }
 }
