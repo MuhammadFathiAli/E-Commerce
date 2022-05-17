@@ -2,6 +2,7 @@
 using API.Helper;
 using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Extensions
@@ -11,13 +12,15 @@ namespace API.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection Services)
         {
             //Add Custome Services
-            //product repo service
             Services.AddScoped<IProductRepository, ProductRepository>();
+            //product repo service
             Services.AddScoped<IBasketRepository, BasketRepository>();
             //generic reposiotry service 
             Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //auto mapper service
             Services.AddAutoMapper(typeof(MappingProfiles));
+            //add JWT Service 
+            Services.AddScoped<ITokenService, TokenService>();
             //configure api controller attribute 
             Services.Configure<ApiBehaviorOptions>(options =>
             {
