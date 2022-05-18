@@ -69,17 +69,5 @@ namespace API.Controllers
 
         }
 
-        [HttpPost("{id}")]
-        public async Task<ActionResult<ProductToReturnDto>> UpdateProduct(int id, [FromBody] Product product)
-        {
-            var prd = await productRepo.UpdateAsync(id, product);
-            return mapper.Map<Product, ProductToReturnDto>(prd);
-        }
-        [HttpDelete]
-        public async Task<ActionResult<bool>> DeleteProduct(int id)
-        {
-           return await productRepo.DeleteAsync(id);
-        }
-
     }
 }

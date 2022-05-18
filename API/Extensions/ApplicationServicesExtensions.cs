@@ -15,8 +15,12 @@ namespace API.Extensions
             Services.AddScoped<IProductRepository, ProductRepository>();
             //product repo service
             Services.AddScoped<IBasketRepository, BasketRepository>();
+            //UOW Service
+            Services.AddScoped<IUnitOfWork, UnitOfWork>();
             //generic reposiotry service 
             Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            //add order service
+            Services.AddScoped<IOrderService, OrderService>();
             //auto mapper service
             Services.AddAutoMapper(typeof(MappingProfiles));
             //add JWT Service 

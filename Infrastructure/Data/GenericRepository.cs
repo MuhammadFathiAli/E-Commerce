@@ -50,24 +50,23 @@ namespace Infrastructure.Data
             return SpecificationEvaluator<T>.GetQuery(context.Set<T>().AsQueryable(), spec);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public void Add(T entity)
         {
-            var entity =  await context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
-            if (entity == null) return false;
-
-            EntityEntry entityEntry = context.Entry<T>(entity);
-            entityEntry.State = EntityState.Deleted;
-            await context.SaveChangesAsync();
-            return true;
+            //add will begin tracking this entity and any other related entites that not tracked
+            //tracked entities with state added will be added to DB when context.savechanges()
+            context.Set<T>().Add(entity);
         }
 
-        public async Task<T> UpdateAsync(int id, T newentity)
+        public void Update(T entity)
         {
-            var updatedentity = context.Set<T>().FirstOrDefault(x => x.Id == id);
-            EntityEntry entityEntry = context.Entry<T>(updatedentity);
-            entityEntry.State = EntityState.Modified;
-            await context.SaveChangesAsync();
-            return updatedentity;
+            //unchanged then modified
+            context.Set<T>().Attach(entity);
+            context.Entry(entity).State = EntityState.Modified;
+        }
+
+        public void Delete(T entity)
+        {
+            context.Set<T>().Remove(entity);
         }
     }
 }
