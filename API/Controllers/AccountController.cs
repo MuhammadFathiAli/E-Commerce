@@ -71,7 +71,8 @@ namespace API.Controllers
             if (user == null) return Unauthorized(new ApiResponse(401));
             var result = await signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if (!result.Succeeded) return Unauthorized(new ApiResponse(401));
-            return Ok( new UserDto() { Email = loginDto.Email, Token = tokenService.CreateToken(user), DisplayName = user.DisplayName, gender = user.gender,image=user.image});
+            return Ok( new UserDto() { Email = loginDto.Email, Token = tokenService.CreateToken(user), DisplayName = user.DisplayName, gender = user.gender,image=user.image,
+                role = userManager.GetRolesAsync(user).Result.FirstOrDefault() });
         }
        
         [HttpPost("register")]
@@ -101,7 +102,8 @@ namespace API.Controllers
             }
 
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
-            return new UserDto() { Email = registerDto.Email, DisplayName = registerDto.DisplayName, Token = tokenService.CreateToken(user), gender = registerDto.gender, image= registerDto.image};
+            return new UserDto() { Email = registerDto.Email, DisplayName = registerDto.DisplayName, Token = tokenService.CreateToken(user), gender = registerDto.gender, image= registerDto.image,
+                role = userManager.GetRolesAsync(user).Result.FirstOrDefault()};
         }
     }
 }

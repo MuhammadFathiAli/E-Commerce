@@ -19,6 +19,8 @@ namespace API.Extensions
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
             //generic reposiotry service 
             Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            // add product service
+            Services.AddScoped<IProductService, ProductService>();
             //add order service
             Services.AddScoped<IOrderService, OrderService>();
             //auto mapper service
