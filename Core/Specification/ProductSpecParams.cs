@@ -16,8 +16,7 @@ namespace Core.Specification
             get { return _pageSize; }
             set { _pageSize = (value > MaxPageSize) ? MaxPageSize :value ; }
         }
-        public int? BrandId { get; set; }
-        public int? TypeId { get; set; }
+        public int? CategoryId { get; set; }
         public string? sort { get; set; }
 
         private string? _search;

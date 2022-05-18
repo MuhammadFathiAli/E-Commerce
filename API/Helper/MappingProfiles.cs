@@ -11,9 +11,8 @@ namespace API.Helper
         public MappingProfiles()
         {
             CreateMap<Product, ProductToReturnDto>()
-                .ForMember(d => d.ProductType, o => o.MapFrom(s => s.ProductType.Name))
-                .ForMember(d => d.ProductBrand, o => o.MapFrom(s => s.ProductBrand.Name))
-                .ForMember(d => d.PictureUrl, o => o.MapFrom<ProductUrlResolver>()).ReverseMap();
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Title))
+                .ForMember(d => d.Image, o => o.MapFrom<ProductUrlResolver>()).ReverseMap();
             CreateMap<Core.Identity.Address, AddressDto>().ReverseMap();
             CreateMap<CustomeBaksetDto, CustomerBasket>();
             CreateMap<BasketItemDto, BasketItem>();
@@ -24,10 +23,9 @@ namespace API.Helper
                 .ForMember(d => d.ShippingPrice, o => o.MapFrom(s => s.DeliveryMethod.Price));
             CreateMap<OrderItem, OrderItemDto>()
                 .ForMember(d => d.ProductId, o => o.MapFrom(s => s.itemOrdered.ProductItemId))
-                .ForMember(d => d.ProductName, o => o.MapFrom(s => s.itemOrdered.ProductName))
-                .ForMember(d => d.PictureUrl, o => o.MapFrom(s => s.itemOrdered.PicturelUrl))
-                .ForMember(d => d.PictureUrl, o => o.MapFrom<OrderItemUrlResolver>());
-            CreateMap<ProductToReturnDto, Product>();
+                .ForMember(d => d.Title, o => o.MapFrom(s => s.itemOrdered.Title))
+                .ForMember(d => d.Image, o => o.MapFrom(s => s.itemOrdered.Image))
+                .ForMember(d => d.Image, o => o.MapFrom<OrderItemUrlResolver>());
             }
         }
 }
