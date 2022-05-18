@@ -26,7 +26,7 @@ namespace API.Controllers
             mapper = _mapper;
         }
        
-       [Authorize]
+       [Authorize(Roles ="Admin")]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
@@ -46,7 +46,7 @@ namespace API.Controllers
             return await userManager.FindByEmailAsync(email) != null;
         }
         
-        [Authorize]
+        [Authorize(Roles ="Admin")]
         [HttpGet("address")]
         public async Task<ActionResult<AddressDto>> GetUserAddress()
         {
