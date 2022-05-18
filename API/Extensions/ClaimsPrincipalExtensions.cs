@@ -9,5 +9,6 @@ namespace API.Extensions
             return user.FindFirstValue(ClaimTypes.Email);
         }
 
+
     }
 }

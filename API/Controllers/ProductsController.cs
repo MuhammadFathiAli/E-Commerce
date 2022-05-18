@@ -49,7 +49,7 @@ namespace API.Controllers
 
         }
 
-        [Authorize]
+       
         [HttpGet("Categories")]
         public async Task<ActionResult<List<Category>>> Categories()
         {
@@ -87,7 +87,7 @@ namespace API.Controllers
             if (updatedProduct == null) return BadRequest(new ApiResponse(400, "Product Couldn't be Updated"));
             return mapper.Map<Product, ProductToReturnDto>(updatedProduct);
         }
-        [Authorize(Roles = "Admin")]
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<ProductToReturnDto>> ProductAsync(int id)
         {
@@ -97,7 +97,7 @@ namespace API.Controllers
 
         }
         
-        [Authorize(Roles = "User,Admin")]
+
         [HttpGet("Categories/{id}")]
         public async Task<ActionResult<Category>> Category(int id)
         {
@@ -106,7 +106,8 @@ namespace API.Controllers
             return category;
 
         }
-
+        
+        [Authorize(Roles = "Admin")]
         [HttpPost("Categories")]
         public async Task<ActionResult<Category>> CreateCategoryAsync(Category category)
         {

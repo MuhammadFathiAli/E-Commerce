@@ -26,16 +26,17 @@ namespace API.Controllers
             mapper = _mapper;
         }
        
-       // [Authorize]
+       [Authorize]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
             var user = await userManager.FindByEmailFromClaimsPrinciple(HttpContext.User);
-            return new UserDto
+            return  new UserDto
             {
                 Email = user.Email,
                 Token = tokenService.CreateToken(user),
                 DisplayName = user.DisplayName,
+                role = userManager.GetRolesAsync(user).Result.SingleOrDefault()
             };
         }
        
@@ -50,6 +51,7 @@ namespace API.Controllers
         public async Task<ActionResult<AddressDto>> GetUserAddress()
         {
             var user = await userManager.FindUserByClaimsPrincipleWithAddressAsync(HttpContext.User);
+            if (user == null) return BadRequest(new ApiResponse(400,"No Address Provided"));
             return mapper.Map<Address, AddressDto>(user.Address);
         }
         
@@ -104,6 +106,23 @@ namespace API.Controllers
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
             return new UserDto() { Email = registerDto.Email, DisplayName = registerDto.DisplayName, Token = tokenService.CreateToken(user), gender = registerDto.gender, image= registerDto.image,
                 role = userManager.GetRolesAsync(user).Result.FirstOrDefault()};
+        }
+        [Authorize]
+        [HttpPut("user")]
+        public async Task<ActionResult<UserDto>> UpdateUserAsync([FromQuery] string email, [FromBody]UserDto user)
+        {
+            var targetUser = await userManager.FindByEmailAsync(email);
+            if (targetUser == null) return BadRequest(new ApiResponse(400, "Wrong Email"));
+            if (email != user.Email) return BadRequest(new ApiResponse(400, "Wrong Email"));
+            targetUser.Email = email;
+            targetUser.DisplayName = user.DisplayName;
+            targetUser.gender = user.gender;
+            targetUser.image = user.image;
+             await userManager.AddToRoleAsync(targetUser,user.role);
+            var result = await userManager.UpdateAsync(targetUser);
+            if (!result.Succeeded) return BadRequest("Couldn't be updated");
+            return  Ok(user);
+
         }
     }
 }
