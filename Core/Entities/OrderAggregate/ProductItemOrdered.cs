@@ -21,12 +21,12 @@ namespace Core.Entities.OrderAggregate
         public ProductItemOrdered(int productItemId, string productName, string picturelUrl)
         {
             ProductItemId = productItemId;
-            ProductName = productName;
-            PicturelUrl = picturelUrl;
+            Title = productName;
+            Image = picturelUrl;
         }
 
         public int ProductItemId { get; set; }
-        public string ProductName { get; set; }
-        public string PicturelUrl { get; set; }
+        public string Title { get; set; }
+        public string Image { get; set; }
     }
 }

@@ -31,30 +31,34 @@ namespace Infrastructure.Services
             return await unitOfWork.Repository<Product>().GetEntityWithSpec(spec);
 
         }
-        public async Task<IReadOnlyList<ProductBrand>> GetAllProductBrandsAsync()
+        public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync()
         {
-            return await unitOfWork.Repository<ProductBrand>().GetAllAsync();
+            return await unitOfWork.Repository<Category>().GetAllAsync();
         }
-        public async Task<ProductBrand> GetProductBrandByIdAsync(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            return await unitOfWork.Repository<ProductBrand>().GetByIdAsync(id);
+               var category = await unitOfWork.Repository<Category>().GetByIdAsync(id);
+            if (category == null) return null;
+            return category;
 
         }
-        public async Task<IReadOnlyList<ProductType>> GetAllProductTypesAsync()
+        public async Task<Category> GetCategoryByNameAsync(string ctg)
         {
-            return await unitOfWork.Repository<ProductType>().GetAllAsync();
-        }
+            var spec = new CategoryWithNameSpecification(ctg);
+            return await unitOfWork.Repository<Category>().GetEntityWithSpec(spec);
 
-        public async Task<ProductBrand> AddBrandAsync(ProductBrand brand)
+        }
+        public async Task<Category> AddCategoryAsync(Category category)
         {
-            unitOfWork.Repository<ProductBrand>().Add(brand);
+            unitOfWork.Repository<Category>().Add(category);
             var results = await unitOfWork.Complete();
             if (results <= 0) return null;
-            return brand;
+            return category;
         }
 
         public async Task<Product> AddProductAsync(Product product)
         {
+
             unitOfWork.Repository<Product>().Add(product);
             var results = await unitOfWork.Complete();
             if (results <= 0) return null;
@@ -62,40 +66,41 @@ namespace Infrastructure.Services
         }
 
 
-        public async Task<ProductBrand> DeleteBrandAsync(int id)
+        public async Task<Category> DeleteCategoryAsync(int id)
         {
-            var brand = await unitOfWork.Repository<ProductBrand>().GetByIdAsync(id);
-            unitOfWork.Repository<ProductBrand>().Delete(brand);
+            var category = await unitOfWork.Repository<Category>().GetByIdAsync(id);
+            unitOfWork.Repository<Category>().Delete(category);
             var results = await unitOfWork.Complete();
             if (results <= 0) return null;
-            return brand;
+            return category;
         }
 
         public  async Task<Product> DeleteProductAsync(int id)
         {
             var product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
+            if (product == null) return null;
             unitOfWork.Repository<Product>().Delete(product);
             var results = await unitOfWork.Complete();
             if (results <= 0) return null;
             return product;
         }
 
-        public async Task<ProductBrand> EditBrandAsync(int id, ProductBrand brand)
+        public async Task<Category> EditCategoryAsync(int id, Category category)
         {
-            var updatedbrand = await unitOfWork.Repository<ProductBrand>().GetByIdAsync(id);
-            unitOfWork.Repository<ProductBrand>().Update(updatedbrand);
-            var results = await unitOfWork.Complete();
-            if (results <= 0) return null;
-            return updatedbrand;
+            unitOfWork.Repository<Category>().Update(category);
+            var result = await unitOfWork.Complete();
+
+            if (result <= 0) return null;
+            return category;
         }
 
         public async Task<Product> EditProduct(int id, Product product)
         {
-            var updatedproduct = await unitOfWork.Repository<Product>().GetByIdAsync(id);
-            unitOfWork.Repository<Product>().Update(updatedproduct);
-            var results = await unitOfWork.Complete();
-            if (results <= 0) return null;
-            return updatedproduct;
+            unitOfWork.Repository<Product>().Update(product);
+            var result = await unitOfWork.Complete();
+
+            if (result <= 0) return null;
+            return product;
         }
 
         public async Task<int> ProductCountAsync(ProductSpecParams productParams)

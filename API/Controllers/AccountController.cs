@@ -26,7 +26,7 @@ namespace API.Controllers
             mapper = _mapper;
         }
        
-        [Authorize]
+       // [Authorize]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {

@@ -12,7 +12,7 @@ namespace API.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection Services)
         {
             //Add Custome Services
-            Services.AddScoped<IProductRepository, ProductRepository>();
+            //Services.AddScoped<IProductRepository, ProductRepository>();
             //product repo service
             Services.AddScoped<IBasketRepository, BasketRepository>();
             //UOW Service
