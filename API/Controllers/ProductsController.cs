@@ -11,34 +11,27 @@ namespace API.Controllers
 {
     public class ProductsController : BaseApiController
     {
-        private readonly IGenericRepository<Product> productRepo;
-        private readonly IGenericRepository<ProductBrand> productBrandRepo;
-        private readonly IGenericRepository<ProductType> productTypeRepo;
+        private readonly IProductService productService;
         private readonly IMapper mapper;
 
-        public ProductsController(IGenericRepository<Product> _productRepo,
-            IGenericRepository<ProductBrand> _productBrandRepo,
-            IGenericRepository<ProductType> _productTypeRepo,
+        public ProductsController(IProductService _productService,
             IMapper _mapper)
         {
-            this.productRepo = _productRepo;
-            this.productBrandRepo = _productBrandRepo;
-            this.productTypeRepo = _productTypeRepo;
-            this.mapper = _mapper;
+            productService = _productService;
+            mapper = _mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<Pagination<ProductToReturnDto>>> products(
             [FromQuery] ProductSpecParams productParams)
         {
-            var spec = new ProductsWithTypesAndBrands(productParams);
-            var CountSpec = new ProductsWithFiltersCount(productParams);
-            var TotalItemsCount = await productRepo.CountAsync(CountSpec);
-            var products = await productRepo.ListAsync(spec);
+            var TotalItemsCount = await productService.ProductCountAsync(productParams);
+            var products = await productService.GetAllProductsAsync(productParams);
             var data = mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
 
             return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex, productParams.PageSize, TotalItemsCount, data));
         }
+
 
 
         [HttpGet("{id}")]
@@ -46,28 +39,65 @@ namespace API.Controllers
         //not neccassry to do it in every action 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductToReturnDto>> product(int id)
+        public async Task<ActionResult<Product>> product(int id)
         {
-            var spec = new ProductsWithTypesAndBrands(id);
-            var prd = await productRepo.GetEntityWithSpec(spec);
-            return mapper.Map<Product, ProductToReturnDto>(prd);
+            var prd = await productService.GetProductByIdAsync(id);
+            //return mapper.Map<Product, ProductToReturnDto>(prd);
+            return prd;
         }
 
 
         [HttpGet("Brands")]
-        public async Task<ActionResult<List<ProductBrand>>> Brands(int id)
+        public async Task<ActionResult<List<ProductBrand>>> Brands()
         {
-            return Ok(await productBrandRepo.GetAllAsync());
+            return Ok(await productService.GetAllProductBrandsAsync());
 
+        }
+        [HttpGet("Brands/{id}")]
+
+        public async Task<ActionResult<ProductBrand>> Brand(int id)
+        {
+            return await productService.GetProductBrandByIdAsync(id);
         }
 
 
         [HttpGet("Types")]
-        public async Task<ActionResult<List<ProductType>>> Types(int id)
+        public async Task<ActionResult<List<ProductType>>> Types()
         {
-            return Ok(await productTypeRepo.GetAllAsync());
+            return Ok(await productService.GetAllProductTypesAsync());
 
         }
+
+
+        [HttpPost]
+        public async Task<ActionResult<Product>> CreateProductAsync(ProductToReturnDto product)
+        {
+            var InputPrd = mapper.Map<ProductToReturnDto, Product>(product);
+            var prd = await productService.AddProductAsync(InputPrd);
+            return prd;
+        }
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductToReturnDto>> UpdateProductAsync(int id, Product product)
+        {
+            var prd = await productService.EditProduct(id,product);
+            return mapper.Map<Product, ProductToReturnDto>(prd);
+        }
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Product>> ProductAsync(int id)
+        {
+           return await productService.DeleteProductAsync(id);
+            
+        }
+
+
+        //            public async Task<ActionResult<Order>> CreateOrderAsync(OrderDto orderDto)
+        //{
+        //    var email = HttpContext.User.RetriveEmailFromPrincipal();
+        //    var address = mapper.Map<AddressDto, Address>(orderDto.ShipToAddress);
+        //    var order = await orderService.CreateOrderAsync(email, orderDto.DeliveryMethodId, orderDto.BasketId, address);
+        //    if (order == null) return BadRequest(new ApiResponse(400, "Problem Creating Order"));
+        //    return Ok(order);
+        //}
 
     }
 }
