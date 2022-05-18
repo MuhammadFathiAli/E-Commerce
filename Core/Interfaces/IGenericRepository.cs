@@ -15,8 +15,12 @@ namespace Core.Interfaces
         Task<T> GetEntityWithSpec(ISpecification<T> spec);
         Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec);
         Task<int> CountAsync(ISpecification<T> spec);
-        Task<bool> DeleteAsync (int id);
-        Task<T> UpdateAsync (int id, T entity);
+        
+        //Not async: Repo isn't responsilbe of saving changes on db, left to uow
+        //not directly do the action on db when we use these methods, just want EF to trach these changes
+        void Add(T entity);
+        void Update(T entity);
+        void Delete(T entity);
 
     }
 }

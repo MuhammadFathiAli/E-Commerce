@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Entities.OrderAggregate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,16 @@ namespace Infrastructure.Data
                         context.Products.Add(product);
                     }
                    await context.SaveChangesAsync();
+                }
+                if (!context.DeliveryMethods.Any())
+                {
+                    var dmsData = File.ReadAllText("../Infrastructure/SeedData/delivery.json");
+                    var dms = JsonSerializer.Deserialize<List<DeliveryMethod>>(dmsData);
+                    foreach (var dm in dms)
+                    {
+                        context.DeliveryMethods.Add(dm);
+                    }
+                    await context.SaveChangesAsync();
                 }
             }
         }
