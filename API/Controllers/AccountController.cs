@@ -26,7 +26,7 @@ namespace API.Controllers
             mapper = _mapper;
         }
        
-       [Authorize]
+       [Authorize(Roles ="Admin")]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
@@ -46,7 +46,7 @@ namespace API.Controllers
             return await userManager.FindByEmailAsync(email) != null;
         }
         
-        [Authorize]
+        [Authorize(Roles ="Admin")]
         [HttpGet("address")]
         public async Task<ActionResult<AddressDto>> GetUserAddress()
         {
@@ -107,6 +107,8 @@ namespace API.Controllers
             return new UserDto() { Email = registerDto.Email, DisplayName = registerDto.DisplayName, Token = tokenService.CreateToken(user), gender = registerDto.gender, image= registerDto.image,
                 role = userManager.GetRolesAsync(user).Result.FirstOrDefault()};
         }
+
+        //check if authorize for admin only 
         [Authorize]
         [HttpPut("user")]
         public async Task<ActionResult<UserDto>> UpdateUserAsync([FromQuery] string email, [FromBody]UserDto user)
