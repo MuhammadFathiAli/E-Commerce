@@ -40,6 +40,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdForUser(int id)
         {
+
             var email = HttpContext.User.RetriveEmailFromPrincipal();
             var order = await orderService.GetOrderByIdAsync(id,email);
             if (order == null) return BadRequest(new ApiResponse(404));

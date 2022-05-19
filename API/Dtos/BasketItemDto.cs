@@ -7,7 +7,9 @@ namespace API.Dtos
         [Required]
         public int Id { get; set; }
         [Required]
-        public string ProductName { get; set; }
+        public string Title { get; set; }
+        [Required]
+        public string Description { get; set; }
         [Required]
         [Range(0.1,double.MaxValue, ErrorMessage ="Price must be grater than zero")]
         public decimal Price { get; set; }
@@ -15,10 +17,8 @@ namespace API.Dtos
         [Range(1,double.MaxValue, ErrorMessage = "Quantity must be grater than zero")]
         public int Quantity { get; set; }
         [Required]
-        public string PictureUrl { get; set; }
+        public string Image { get; set; }
         [Required]
-        public string Brand { get; set; }
-        [Required]
-        public string Type { get; set; }
+        public string Category { get; set; }
     }
 }
