@@ -21,7 +21,7 @@ namespace Infrastructure.Services
         {
             var spec = new ProductsWithTypesAndBrands(productParams);
             var CountSpec = new ProductsWithFiltersCount(productParams);
-            var TotalItemsCount = await unitOfWork.Repository<Product>().CountAsync(CountSpec);
+            //var TotalItemsCount = await unitOfWork.Repository<Product>().CountAsync(CountSpec);
             var products = await unitOfWork.Repository<Product>().ListAsync(spec);
             return products;
         }
