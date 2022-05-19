@@ -35,21 +35,64 @@ namespace API.Controllers
         {
             var email = HttpContext.User.RetriveEmailFromPrincipal();
             var orders = await orderService.GetOrdersForUserAsync(email);
-            return Ok(mapper.Map<IReadOnlyList<Order>, IReadOnlyList<OrderToReturnDto>>(orders));
+            return Ok(mapper.Map<IReadOnlyList<Order>, IReadOnlyList<OrderToReturnDtoItemTitlesOnly>>(orders));
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdForUser(int id)
-        {
 
-            var email = HttpContext.User.RetriveEmailFromPrincipal();
-            var order = await orderService.GetOrderByIdAsync(id,email);
+        [Authorize(Roles = "Admin")]
+        [HttpGet("PendingOrders")]
+        public async Task<ActionResult<IReadOnlyList<OrderToReturnDtoItemTitlesOnly>>> GetAllPendingOrders()
+        {
+            var orders = await orderService.GetPendingOrdersAsync();
+            return Ok(mapper.Map<IReadOnlyList<Order>, IReadOnlyList<OrderToReturnDtoItemTitlesOnly>>(orders));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdByAdmin(int id)
+        {
+            var order = await orderService.GetOrderByIdForAllForAsync(id);
+         
             if (order == null) return BadRequest(new ApiResponse(404));
-            return Ok(mapper.Map<Order,OrderToReturnDto>(order));
+            return Ok(mapper.Map<Order, OrderToReturnDtoItemTitlesOnly>(order));
         }
         [HttpGet("deliveryMethods")]
         public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetDeliveryMethods()
         {
             return Ok(await orderService.GetDeliveryMethodsAsync());
         }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpPut("AcceptOrder/{id}")]
+        public async Task<ActionResult<OrderToReturnDto>> AcceptOrder(int id)
+        {
+            var order = await orderService.GetOrderByIdForAllForAsync(id);
+            if (order.Status != OrderStatus.Pending) return BadRequest(new ApiResponse(400, "Order Status is not Pending"));
+            order.Status = OrderStatus.OrderAccepted;
+            var updatedOrder = await orderService.UpdateOrder(order);
+            if (updatedOrder == null) return BadRequest(new ApiResponse (400, "Order Couldn't be updated"));
+            return Ok(mapper.Map<Order, OrderToReturnDtoItemTitlesOnly>(updatedOrder));
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPut("RejectOrder/{id}")]
+        public async Task<ActionResult<OrderToReturnDto>> RejectOrder(int id)
+        {
+            var order = await orderService.GetOrderByIdForAllForAsync(id);
+            if (order.Status != OrderStatus.Pending) return BadRequest(new ApiResponse(400, "Order Status is not Pending"));
+            order.Status = OrderStatus.OrderRejected;
+            var updatedOrder = await orderService.UpdateOrder(order);
+            if (updatedOrder == null) return BadRequest(new ApiResponse(400, "Order Couldn't be updated"));
+            return Ok(mapper.Map<Order, OrderToReturnDtoItemTitlesOnly>(updatedOrder));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<OrderToReturnDtoItemTitlesOnly>> DeleteOrder(int id)
+        {
+            var order = await orderService.DeleteOrder(id);
+            if (order == null) return BadRequest(new ApiResponse(400, "Order Couldn't be deleted"));
+            return mapper.Map<Order, OrderToReturnDtoItemTitlesOnly>(order);
+
+        }
+
+
+
     }
 }

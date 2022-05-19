@@ -23,5 +23,24 @@ namespace Core.Specification
             AddInclude(o => o.OrderItems);
             AddInclude(o => o.DeliveryMethod);
         }
+
+        public OrdersWithItemsAndOrderingSpecification(int id) : base (o => o.Id == id)
+        {
+            AddInclude (o => o.OrderItems);
+            AddInclude (o => o.DeliveryMethod);
+            //    AddInclude (o => o.OrderDate);
+            //    AddInclude (o => o.Status);
+            //    AddInclude (o => o.BuyerEmail);
+            //    AddInclude (o => o.SubTotal);
+        }
+        public OrdersWithItemsAndOrderingSpecification(OrderStatus status) : base(o => o.Status == status )
+        {
+            AddInclude(o => o.OrderItems);
+            AddInclude(o => o.DeliveryMethod);
+            //AddInclude(o => o.OrderDate);
+            //AddInclude(o => o.Status);
+            //AddInclude(o => o.BuyerEmail);
+            //AddInclude(o => o.SubTotal);
+        }
     }
 }
