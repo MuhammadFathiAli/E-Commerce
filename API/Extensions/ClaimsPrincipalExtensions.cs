@@ -8,6 +8,10 @@ namespace API.Extensions
         {
             return user.FindFirstValue(ClaimTypes.Email);
         }
+        public static string RetriveRoleFromPrincipal(this ClaimsPrincipal user)
+        {
+            return user.FindFirstValue(ClaimTypes.Role);
+        }
 
 
     }

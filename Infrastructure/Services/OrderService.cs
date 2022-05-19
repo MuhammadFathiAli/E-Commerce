@@ -71,6 +71,36 @@ namespace Infrastructure.Services
             return await unitOfWork.Repository<DeliveryMethod>().GetAllAsync();
         }
 
+        public async Task<Order> GetOrderByIdForAllForAsync (int id)
+        {
+            var spec = new OrdersWithItemsAndOrderingSpecification (id);
+            return await unitOfWork.Repository<Order>().GetEntityWithSpec (spec);
+        }
 
+        public async Task<Order> UpdateOrder(Order order)
+        {
+            unitOfWork.Repository<Order>().Update(order);
+            var result = await unitOfWork.Complete();
+
+            if (result <= 0) return null;
+            return order;
+        }
+
+        public async Task<Order> DeleteOrder(int id)
+        {
+            var order = await unitOfWork.Repository<Order>().GetByIdAsync(id);
+            if (order == null) return null;
+            if (order.Status != OrderStatus.Pending) return null;
+            unitOfWork.Repository<Order>().Delete(order);
+            var results = await unitOfWork.Complete();
+            if (results <= 0) return null;
+            return order;
+            
+        }
+        public async Task<IReadOnlyList<Order>> GetPendingOrdersAsync()
+        {
+            var spec = new OrdersWithItemsAndOrderingSpecification(OrderStatus.Pending);
+            return await unitOfWork.Repository<Order>().ListAsync(spec);
+        }
     }
 }
